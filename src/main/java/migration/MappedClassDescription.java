@@ -1,13 +1,17 @@
 package main.java.migration;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+
+import org.w3c.dom.Element;
 
 import main.java.migration.field.FieldDescription;
 
 public class MappedClassDescription {
 	private Class classType;
-	private String className;
-	private Map<String,FieldDescription> fields;
+	private String className, tableName;
+	private SortedMap<String,FieldDescription> fields;
 	private String path, desc;
 	public Class getClassType() {
 		return classType;
@@ -18,13 +22,13 @@ public class MappedClassDescription {
 	public String getClassName() {
 		return className;
 	}
-	public void setClassName(String className) {
-		this.className = className;
+	public void setClassName(String src) {
+		this.className = src;
 	}
-	public Map<String, FieldDescription> getFields() {
+	public SortedMap<String, FieldDescription> getFields() {
 		return fields;
 	}
-	public void setFields(Map<String, FieldDescription> fields) {
+	public void setFields(SortedMap<String, FieldDescription> fields) {
 		this.fields = fields;
 	}
 	public String getPath() {
@@ -38,6 +42,24 @@ public class MappedClassDescription {
 	}
 	public void setDesc(String desc) {
 		this.desc = desc;
+	}
+	
+	@Override
+	public String toString(){
+		String s = className + "\n";
+		for (Entry<String, FieldDescription> entry : fields.entrySet())  
+		{
+			s += entry.getValue().getColumnName() + "\n" + entry.getValue().getFieldName() + "\n";
+		}
+		return s;
+			
+		
+	}
+	public String getTableName() {
+		return tableName;
+	}
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
 	}
 	
 }

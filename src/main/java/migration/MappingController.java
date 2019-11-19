@@ -8,9 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import main.java.action.fetching.FetchingController;
+
 
 public class MappingController {
-	Configuration configuration = new Configuration(); 
+	private Configuration configuration = new Configuration(); 
 	
 
 	public void readConfiguration(File file) {
@@ -38,6 +40,15 @@ public class MappingController {
 			}
 		
 		}
+	}
+	
+	public Configuration getConfiguration() {
+		return this.configuration;
+	}
+
+	public FetchingController getFetchingController() {
+		return new FetchingController(this.getConfiguration());
+		
 	}
 	
 }

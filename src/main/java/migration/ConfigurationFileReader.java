@@ -2,8 +2,8 @@ package main.java.migration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -14,6 +14,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import main.java.migration.exceptions.NamesNotMatchingException;
+import main.java.migration.field.FieldDescription;
 
 public class ConfigurationFileReader {	
 	
@@ -45,9 +48,12 @@ public class ConfigurationFileReader {
 	              MappedClassDescription mcd = new MappedClassDescription();
 	              mcd.setPath(clsPath);
 	              mcd.setDesc(desc);
+	              readDescriptionFile(mcd);
 	              configuration.setDescription(clsName, mcd);
 	           }	           
 	        }
+	        
+	       
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -57,6 +63,35 @@ public class ConfigurationFileReader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 	
+	}
+	
+	private static void readDescriptionFile(MappedClassDescription mcd) {
+		try {
+			Document doc = prepareFile(new File(mcd.getDesc()));
+			
+			SortedMap<String, FieldDescription> fieldDescriptions = new TreeMap<>();
+			
+			NodeList classnodeList = doc.getElementsByTagName("property");
+			for (int i=0; i<classnodeList.getLength(); i++) {
+				Node property = classnodeList.item(i);
+				if (property.getNodeType() == Node.ELEMENT_NODE) {
+					Element el = (Element) property;
+					FieldDescription fd = new FieldDescription(el.getAttribute("name"), el.getAttribute("column"), FieldDescription.getFieldType(el.getAttribute("type")));
+					fieldDescriptions.put(el.getAttribute("name"), fd);
+					System.out.println("new description " + el.getAttribute("name"));
+				}
+			}
+			mcd.setFields(fieldDescriptions);
+			NodeList srcs = doc.getElementsByTagName("src-class");
+	        Node src = srcs.item(0);
+	        mcd.setTableName(((Element) src).getAttribute("table"));
+	        mcd.setClassName(((Element) src).getAttribute("name"));
+			
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	

@@ -10,7 +10,7 @@ public class App {
 		MappingController mappingController = new MappingController();
 		
 		Connector.establishConnection();
-		mappingController.readConfiguration(new File("./input.txt"));
+		mappingController.readConfiguration(new File("./input.xml"));
 		
 		
 	}

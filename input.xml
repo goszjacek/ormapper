@@ -2,9 +2,8 @@
 <ormapper>
    <rootPath>src/main/java/</rootPath>
    <classes>
-      <class name="Student" path="com/jgo/pojos/Stock" description="student.xml">  	 
+      <class name="Student" path="com/jgo/pojos/Stock" description="resource/ormapper/src_class_description/student.xml">  	 
       </class>
-      <class path="com/jgo/pojos/Category">    	 
-      </class>
+     
    </classes>
 </ormapper>

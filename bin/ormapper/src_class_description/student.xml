@@ -1,10 +1,10 @@
 <ormapper>
-	<src-class name="Student">
+	<src-class name="Student" table="student" >
 		<properties>
 			<property name="firstName" column="first_name" type="string"></property>
 			<property name="lastName" column="last_name" type="string"></property>
 			<property name="birthDate" column="birth_date" type="string"></property>
-			<propery name="studentId" column="student_id" type="int"></propery>
+			<property name="studentId" column="student_id" type="int"></property>
 		</properties>
 	</src-class>
 </ormapper>
