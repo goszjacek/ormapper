@@ -1,17 +1,23 @@
 package main.java.migration;
 
 import java.util.List;
+import java.util.Map;
 
 public class Configuration {
-	List<String> paths;
+	private Map<String, MappedClassDescription> mappedClassDescs;
 
-	public List<String> getPaths() {
-		return paths;
+	public MappedClassDescription getDescription(String cls) {
+		return mappedClassDescs.get(cls);
+	}
+	
+	public void setDescription(String className, MappedClassDescription desc) {
+		mappedClassDescs.put(className, desc);
 	}
 
-	public void setPaths(List<String> paths) {
-		this.paths = paths;
-	} 
+	
+	public void readDescription() {
+		
+	}
 	
 	
 }

@@ -17,16 +17,21 @@ import org.xml.sax.SAXException;
 
 public class ConfigurationFileReader {	
 	
-	public static List<String> parse(File inputFile){
-		List<String> paths = new ArrayList<String>();
-		
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	private static Document prepareFile(File inputFile) throws ParserConfigurationException, SAXException, IOException {
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
+        dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = dBuilder.parse(inputFile);
+		
+		doc.getDocumentElement().normalize();
+		return doc;
+	}
+	
+	public static void parseMainFile(File inputFile, Configuration configuration){
+		
+        
 		try {
-			dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(inputFile);
-			
-			doc.getDocumentElement().normalize();
+			Document doc = prepareFile(inputFile);
 	        NodeList classNodeList = doc.getElementsByTagName("class");
 	        
 	        for (int i = 0; i < classNodeList.getLength(); i++) {
@@ -34,11 +39,15 @@ public class ConfigurationFileReader {
 	           if (tmpClassNode.getNodeType() == Node.ELEMENT_NODE) {
 	              Element cls = (Element) tmpClassNode;
 	              String path = cls.getAttribute("path");
+	              String desc = cls.getAttribute("description");
+	              String clsName = cls.getAttribute("name");
 	              String clsPath = path.replace('/','.');
-	              paths.add(clsPath);
-	           }
+	              MappedClassDescription mcd = new MappedClassDescription();
+	              mcd.setPath(clsPath);
+	              mcd.setDesc(desc);
+	              configuration.setDescription(clsName, mcd);
+	           }	           
 	        }
-	        
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -47,7 +56,11 @@ public class ConfigurationFileReader {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-		return paths;		
+		} 	
 	}
+	
+	
+	
+	
+	
 }

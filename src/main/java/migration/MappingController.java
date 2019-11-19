@@ -14,12 +14,12 @@ public class MappingController {
 	
 
 	public void readConfiguration(File file) {
-		List<String> paths = ConfigurationFileReader.parse(file);
-		configuration.setPaths(paths);
+		ConfigurationFileReader.parseMainFile(file, configuration);
+		
 	}
 	
 	public int migrateClasses(File file) {
-		scanClasses(configuration.getPaths());
+//		scanClasses(configuration.getPaths());
 //		for(String className : configuration.getClasses());
 		return 0;
 	}
