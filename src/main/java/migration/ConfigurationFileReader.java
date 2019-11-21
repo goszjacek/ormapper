@@ -15,7 +15,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import main.java.migration.exceptions.NamesNotMatchingException;
 import main.java.migration.field.FieldDescription;
 
 public class ConfigurationFileReader {	
@@ -49,6 +48,7 @@ public class ConfigurationFileReader {
 	              mcd.setPath(clsPath);
 	              mcd.setDesc(desc);
 	              readDescriptionFile(mcd);
+	              readClass(mcd);
 	              configuration.setDescription(clsName, mcd);
 	           }	           
 	        }
@@ -94,6 +94,16 @@ public class ConfigurationFileReader {
 		
 	}
 	
+	
+	private static void readClass(MappedClassDescription mcd) {
+		ClassLoader classLoader = Configuration.class.getClassLoader();
+		try {
+			Class<?> thisClass = classLoader.loadClass(mcd.getPath());
+			mcd.setClassType(thisClass);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	
 	

@@ -1,6 +1,8 @@
 package main.java.action.fetching;
 
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -70,7 +72,7 @@ public class FetchingController {
 	            
             // loop through the result set
             while (rs.next()) {
-            	// run constructor for mcd.getClass();
+            	
             	// assign objects using getters 
             	
                 System.out.println(rs.getInt("student_id") +  "\t" + 
@@ -94,4 +96,26 @@ public class FetchingController {
 		}
 		return null;
 	}
+	
+	private <T> Object fillObject(ResultSet rs, MappedClassDescription mcd) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Class<T> mappedClass =  mcd.getClassType();
+		Constructor<T> constructor = mappedClass.getConstructor();
+		Object item = constructor.newInstance();
+		T casted = mappedClass.cast(item);
+		SortedMap<String, FieldDescription> fields = mcd.getFields();
+		Set<String> keys = fields.keySet();
+		Iterator<String> it = keys.iterator();
+		while(it.hasNext()) {
+			 FieldDescription field = (FieldDescription) fields.get(it.next());
+			 //run setter for the field and assign the value
+			 
+		}
+		
+		
+		
+		return null;
+		
+	}
+	
+	
 }
