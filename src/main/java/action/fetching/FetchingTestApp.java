@@ -26,6 +26,11 @@ public class FetchingTestApp {
 		for(Student s : students) {
 			System.out.println(s);
 		}
+		List<Student> filteredStudents =  fetchingController.select(Student.class).where("first_name = 'Andrzej'");
+		for(Student s : filteredStudents) {
+			System.out.println(s);
+		}
+		
 		
 		
 		

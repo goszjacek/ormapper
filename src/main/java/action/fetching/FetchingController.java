@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
-
+import main.java.action.fetching.query.QueryableItem;
+import main.java.action.fetching.utils.ClassFiller;
 import main.java.database.Connector;
 import main.java.migration.Configuration;
 import main.java.migration.MappedClassDescription;
@@ -55,20 +56,10 @@ public class FetchingController {
 	 * @param <T>
 	 * @param cls
 	 */
-	public <T> List<T> selectAll(Class<T> cls) {
-		String sql = "SELECT ";
-		String clsName = cls.getSimpleName();
-		MappedClassDescription mcd = this.configuration.getDescription(clsName);
-		SortedMap<String, FieldDescription> fields = mcd.getFields();
-		Set<String> fieldSet = (Set<String>) mcd.getFields().keySet();
-		Iterator<String> it = fieldSet.iterator();
-		while(it.hasNext()) {
-			String fieldString = it.next();
-			sql += fields.get(fieldString).getColumnName() + ", "; 
-		}
-		sql = sql.substring(0, sql.length()-2);
-		sql += " FROM " + mcd.getTableName();
-		System.out.println(sql);
+	public <T> List<T> selectAll(Class<T> cls) {		
+		MappedClassDescription mcd = this.configuration.getDescription(cls.getSimpleName());
+		String sql = createBasicQueryForClass(cls);
+		System.out.println("Craeted sql: "+ sql);
 		
 		List<T> resultList = new ArrayList<T>();
 		try (Connection conn = Connector.getConnection();
@@ -77,7 +68,10 @@ public class FetchingController {
 	            
             // loop through the result set
             while (rs.next()) {
-            	resultList.add(fillObject(rs, mcd));
+            	T item = ClassFiller.fillObject(rs, mcd);
+            	if(item != null){
+            		resultList.add(item);
+            	}
             }
         } catch (SQLException e) {
         	System.err.println("Unable to connect to database");
@@ -87,65 +81,30 @@ public class FetchingController {
 		return resultList;
 	}
 	
-	private Object getVar(ResultSet rs, String name, FieldType type) throws SQLException {
-		if(type == FieldType.INT) {
-			return rs.getInt(name);
-		}
-		if(type == FieldType.STRING) {
-			return rs.getString(name);
-		}
-		return null;
+	public <T> QueryableItem<T> select(Class <T> cls){
+		String sql = createBasicQueryForClass(cls);
+		MappedClassDescription mcd = this.configuration.getDescription(cls.getSimpleName());
+		System.out.println("Sql passed to queryable item: "+ sql);		
+		
+		return new QueryableItem<T>(sql, mcd);		
 	}
 	
-	private <T> T fillObject(ResultSet rs, MappedClassDescription mcd) {
-		Class<T> mappedClass =  mcd.getClassType();
-		Constructor<T> constructor;
-		T item;
-		
-		try {
-			constructor = mappedClass.getConstructor();	
-		
-		}catch (NoSuchMethodException | SecurityException e) {
-			System.err.println("Wrong class configuration or no empty constuctor defined.");
-			e.printStackTrace();
-			return null;
-		}
-		try {
-			item = constructor.newInstance();
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			System.err.println("Unable to run constructor. Does constuctor without arguments exists?");
-			e.printStackTrace();
-			return null;
-		}
-		
+	private <T> String createBasicQueryForClass(Class <T> cls){
+		MappedClassDescription mcd = this.configuration.getDescription(cls.getSimpleName());
+		String sql = "SELECT ";		
 		SortedMap<String, FieldDescription> fields = mcd.getFields();
-		Set<String> keys = fields.keySet();
-		Iterator<String> it = keys.iterator();
-		
-		try {
-			while(it.hasNext()) {
-				FieldDescription field = (FieldDescription) fields.get(it.next());
-				//	run setter for the field and assign the value
-
-				Method setter = mappedClass.getMethod(MethodNameConverter.getSetter(field.getFieldName()), field.getClassType());
-				
-				setter.invoke(item, getVar(rs, field.getColumnName(), field.getFieldType()));
-	
-			}
-		} catch (NoSuchMethodException | SecurityException e) {
-			System.err.println("Check if all setter for the fields are defined with default convetions.");
-			e.printStackTrace();
-			return null;
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| SQLException e) {
-			System.err.println("Unable to invoke setter for the field. Check privided column name and filed type. ");
-			e.printStackTrace();
-			return null;
-		} 
-		
-		return item;
+		Set<String> fieldSet = (Set<String>) mcd.getFields().keySet();
+		Iterator<String> it = fieldSet.iterator();
+		while(it.hasNext()) {
+			String fieldString = it.next();
+			sql += fields.get(fieldString).getColumnName() + ", "; 
+		}
+		sql = sql.substring(0, sql.length()-2);
+		sql += " FROM " + mcd.getTableName();
+		return sql;
 	}
+	
+	
 	
 	
 }
