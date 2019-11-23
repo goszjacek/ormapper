@@ -28,6 +28,12 @@ public class Student {
 	public void setStudentId(Integer studentId) {
 		this.studentId = studentId;
 	}
+	@Override
+	public String toString() {
+		return "Student [firstName=" + firstName + ", lastName=" + lastName + ", birthDate=" + birthDate
+				+ ", studentId=" + studentId + "]";
+	}
+	
 	
 	
 }

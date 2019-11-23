@@ -15,6 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import main.java.migration.exceptions.NoAttributeException;
 import main.java.migration.field.FieldDescription;
 
 public class ConfigurationFileReader {	
@@ -76,19 +77,29 @@ public class ConfigurationFileReader {
 				Node property = classnodeList.item(i);
 				if (property.getNodeType() == Node.ELEMENT_NODE) {
 					Element el = (Element) property;
-					FieldDescription fd = new FieldDescription(el.getAttribute("name"), el.getAttribute("column"), FieldDescription.getFieldType(el.getAttribute("type")));
-					fieldDescriptions.put(el.getAttribute("name"), fd);
-					System.out.println("new description " + el.getAttribute("name"));
+					String name = el.getAttribute("name"), column = el.getAttribute("column"), type=el.getAttribute("type");
+					if(name=="" || column=="" || type=="" )
+						throw new NoAttributeException();
+					FieldDescription fd = new FieldDescription(name, column, FieldDescription.getFieldType(type));
+					fieldDescriptions.put(name, fd);
 				}
 			}
 			mcd.setFields(fieldDescriptions);
+			
+			
 			NodeList srcs = doc.getElementsByTagName("src-class");
 	        Node src = srcs.item(0);
-	        mcd.setTableName(((Element) src).getAttribute("table"));
-	        mcd.setClassName(((Element) src).getAttribute("name"));
+	        String table = ((Element) src).getAttribute("table"), name = ((Element) src).getAttribute("name");
+	        if(table=="" || name=="")
+	        	throw new NoAttributeException();
+	        mcd.setTableName(table);
+	        mcd.setClassName(name);
 			
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("The XML is wrong. Check the template documentation. ");
+			e.printStackTrace();
+		} catch (NoAttributeException e) {
+			System.err.println("You didn't provide some of the important attributes. ");
 			e.printStackTrace();
 		}
 		
@@ -101,6 +112,7 @@ public class ConfigurationFileReader {
 			Class<?> thisClass = classLoader.loadClass(mcd.getPath());
 			mcd.setClassType(thisClass);
 		} catch (ClassNotFoundException e) {
+			System.err.println("There is no such class. Define correct class path. Path provided: " + mcd.getPath());
 			e.printStackTrace();
 		}
 	}

@@ -83,7 +83,7 @@ public class FetchingController {
             System.out.println(e.getMessage());
         }
 		
-		return null;
+		return resultList;
 	}
 	
 	private Object getVar(ResultSet rs, String name, FieldType type) throws SQLException {
@@ -125,9 +125,10 @@ public class FetchingController {
 		try {
 			while(it.hasNext()) {
 				FieldDescription field = (FieldDescription) fields.get(it.next());
-				//	run setter for the field and assign the value			
+				//	run setter for the field and assign the value
+
 				Method setter = mappedClass.getMethod(MethodNameConverter.getSetter(field.getFieldName()), field.getClassType());
-		
+				
 				setter.invoke(item, getVar(rs, field.getColumnName(), field.getFieldType()));
 	
 			}

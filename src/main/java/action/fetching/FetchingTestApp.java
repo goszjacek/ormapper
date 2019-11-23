@@ -1,6 +1,7 @@
 package main.java.action.fetching;
 
 import java.io.File;
+import java.util.List;
 
 import main.java.database.Connector;
 import main.java.migration.MappingController;
@@ -16,7 +17,11 @@ public class FetchingTestApp {
 		mappingController.readConfiguration(new File("./input.xml"));
 		
 		FetchingController fetchingController = mappingController.getFetchingController();
-		fetchingController.selectAll(Student.class);
+		List<Student> students = fetchingController.selectAll(Student.class);
+		for(Student s : students) {
+			System.out.println(s);
+		}
+		
 		
 	}
 
