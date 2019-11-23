@@ -1,10 +1,7 @@
 package main.java.migration;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
-
-import org.w3c.dom.Element;
 
 import main.java.migration.field.FieldDescription;
 
@@ -16,7 +13,7 @@ public class MappedClassDescription {
 	public Class getClassType() {
 		return classType;
 	}
-	public void setClassType(Class classType) {
+	public void setClassType(Class<?> classType) {
 		this.classType = classType;
 	}
 	public String getClassName() {
@@ -43,7 +40,9 @@ public class MappedClassDescription {
 	public void setDesc(String desc) {
 		this.desc = desc;
 	}
-
+	public FieldDescription getField(String fieldName) {
+		return fields.get(fieldName);
+	}
 	
 	@Override
 	public String toString(){

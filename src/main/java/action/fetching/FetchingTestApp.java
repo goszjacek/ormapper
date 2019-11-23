@@ -3,6 +3,7 @@ package main.java.action.fetching;
 import java.io.File;
 import java.util.List;
 
+import main.java.action.fetching.query.QueryMode;
 import main.java.database.Connector;
 import main.java.migration.MappingController;
 import main.java.migration.exceptions.ParsingError;
@@ -28,6 +29,11 @@ public class FetchingTestApp {
 		}
 		List<Student> filteredStudents =  fetchingController.select(Student.class).where("first_name = 'Andrzej'");
 		for(Student s : filteredStudents) {
+			System.out.println(s);
+		}
+		
+		List<Student> withClassFieldsWheredStudents = fetchingController.select(Student.class).where("firstName", "=","'Andrzej'", QueryMode.CLASS);
+		for(Student s : withClassFieldsWheredStudents) {
 			System.out.println(s);
 		}
 		
