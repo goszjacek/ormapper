@@ -80,6 +80,7 @@ public class FetchingController {
             	resultList.add(fillObject(rs, mcd));
             }
         } catch (SQLException e) {
+        	System.err.println("Unable to connect to database");
             System.out.println(e.getMessage());
         }
 		

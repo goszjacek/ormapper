@@ -16,6 +16,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import main.java.migration.exceptions.NoAttributeException;
+import main.java.migration.exceptions.ParsingError;
+import main.java.migration.exceptions.WrongClassDescriptionException;
 import main.java.migration.field.FieldDescription;
 
 public class ConfigurationFileReader {	
@@ -30,7 +32,7 @@ public class ConfigurationFileReader {
 		return doc;
 	}
 	
-	public static void parseMainFile(File inputFile, Configuration configuration){
+	public static void parseMainFile(File inputFile, Configuration configuration) throws ParsingError{
 		
         
 		try {
@@ -48,25 +50,30 @@ public class ConfigurationFileReader {
 	              MappedClassDescription mcd = new MappedClassDescription();
 	              mcd.setPath(clsPath);
 	              mcd.setDesc(desc);
-	              readDescriptionFile(mcd);
-	              readClass(mcd);
-	              configuration.setDescription(clsName, mcd);
+	              try {
+	            	  readDescriptionFile(mcd);
+	            	  readClass(mcd);
+	            	  configuration.setDescription(clsName, mcd);
+	              } catch(WrongClassDescriptionException e) {
+	            	  System.err.println("Class description couldn't be read. ");
+	            	  throw new ParsingError();
+	              } catch(ClassNotFoundException e) {
+	            	  System.err.println("Class not found. Check configuration of the class");
+	            	  throw new ParsingError();
+	              }
+	              
 	           }	           
 	        }
 	        
 	       
-		} catch (ParserConfigurationException e) {
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			System.err.println("Parsing error");
 			e.printStackTrace();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 	
+			throw new ParsingError();
+		}
 	}
 	
-	private static void readDescriptionFile(MappedClassDescription mcd) {
+	private static void readDescriptionFile(MappedClassDescription mcd) throws WrongClassDescriptionException {
 		try {
 			Document doc = prepareFile(new File(mcd.getDesc()));
 			
@@ -98,23 +105,22 @@ public class ConfigurationFileReader {
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			System.err.println("The XML is wrong. Check the template documentation. ");
 			e.printStackTrace();
+			throw new WrongClassDescriptionException();
 		} catch (NoAttributeException e) {
 			System.err.println("You didn't provide some of the important attributes. ");
 			e.printStackTrace();
+			throw new WrongClassDescriptionException();
 		}
 		
 	}
 	
 	
-	private static void readClass(MappedClassDescription mcd) {
+	private static void readClass(MappedClassDescription mcd) throws ClassNotFoundException {
 		ClassLoader classLoader = Configuration.class.getClassLoader();
-		try {
-			Class<?> thisClass = classLoader.loadClass(mcd.getPath());
-			mcd.setClassType(thisClass);
-		} catch (ClassNotFoundException e) {
-			System.err.println("There is no such class. Define correct class path. Path provided: " + mcd.getPath());
-			e.printStackTrace();
-		}
+		
+		Class<?> thisClass = classLoader.loadClass(mcd.getPath());
+		mcd.setClassType(thisClass);
+	
 	}
 	
 	

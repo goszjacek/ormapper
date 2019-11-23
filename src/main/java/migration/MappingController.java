@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import main.java.action.fetching.FetchingController;
+import main.java.migration.exceptions.ParsingError;
 
 
 public class MappingController {
 	private Configuration configuration = new Configuration(); 
 	
 
-	public void readConfiguration(File file) {
+	public void readConfiguration(File file) throws ParsingError {
 		ConfigurationFileReader.parseMainFile(file, configuration);
 		
 	}
