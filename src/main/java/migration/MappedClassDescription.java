@@ -1,5 +1,6 @@
 package main.java.migration;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
@@ -10,6 +11,13 @@ public class MappedClassDescription {
 	private String className, tableName;
 	private SortedMap<String,FieldDescription> fields;
 	private String path, desc;
+	FieldDescription id;
+	public FieldDescription getId() {
+		return id;
+	}
+	public void setId(FieldDescription id) {
+		this.id = id;
+	}
 	public Class getClassType() {
 		return classType;
 	}
@@ -22,7 +30,7 @@ public class MappedClassDescription {
 	public void setClassName(String src) {
 		this.className = src;
 	}
-	public SortedMap<String, FieldDescription> getFields() {
+	public Map<String, FieldDescription> getFields() {
 		return fields;
 	}
 	public void setFields(SortedMap<String, FieldDescription> fields) {
@@ -61,5 +69,6 @@ public class MappedClassDescription {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
+
 	
 }

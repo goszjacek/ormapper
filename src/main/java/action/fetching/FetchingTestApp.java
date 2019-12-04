@@ -6,7 +6,7 @@ import java.util.List;
 import main.java.action.fetching.query.QueryMode;
 import main.java.database.Connector;
 import main.java.migration.MappingController;
-import main.java.migration.exceptions.ParsingError;
+import main.java.migration.exceptions.ParsingException;
 import main.java.src_class.Student;
 
 public class FetchingTestApp {
@@ -14,11 +14,11 @@ public class FetchingTestApp {
 	public static void main(String[] args) {
 		Connector.establishConnection();
 		MappingController mappingController = new MappingController();
-		Connector.establishConnection();
 		try {
 			mappingController.readConfiguration(new File("./input.xml"));
-		} catch (ParsingError e) {
+		} catch (ParsingException e) {
 			System.err.println("Configurations files are wrong. Check other messages. ");
+			e.getMessage();
 			e.printStackTrace();
 			return;
 		}
@@ -37,7 +37,13 @@ public class FetchingTestApp {
 			System.out.println(s);
 		}
 		
+		List<Student> student4 = fetchingController.select(Student.class).where("studentId", "=","4", QueryMode.CLASS);
+		for(Student s : student4) {
+			System.out.println(s);
+		}
 		
+		Student one = fetchingController.select(Student.class).id(1);
+		System.out.println(one);
 		
 		
 		

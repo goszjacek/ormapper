@@ -9,14 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 import main.java.action.fetching.FetchingController;
-import main.java.migration.exceptions.ParsingError;
+import main.java.action.storing.StoringController;
+import main.java.migration.exceptions.ParsingException;
 
 
 public class MappingController {
 	private Configuration configuration = new Configuration(); 
 	
 
-	public void readConfiguration(File file) throws ParsingError {
+	public void readConfiguration(File file) throws ParsingException {
 		ConfigurationFileReader.parseMainFile(file, configuration);
 		
 	}
@@ -52,4 +53,7 @@ public class MappingController {
 		
 	}
 	
+	public StoringController getStoringController() {
+		return new StoringController(this.getConfiguration());
+	}
 }

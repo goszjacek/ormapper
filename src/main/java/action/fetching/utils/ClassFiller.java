@@ -6,8 +6,8 @@ import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 
 import main.java.migration.MappedClassDescription;
 import main.java.migration.field.FieldDescription;
@@ -47,7 +47,7 @@ public class ClassFiller {
 			return null;
 		}
 		
-		SortedMap<String, FieldDescription> fields = mcd.getFields();
+		Map<String, FieldDescription> fields = mcd.getFields();
 		Set<String> keys = fields.keySet();
 		Iterator<String> it = keys.iterator();
 		

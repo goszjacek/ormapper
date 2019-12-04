@@ -1,9 +1,6 @@
 package main.java.action.fetching;
 
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,8 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 
 import main.java.action.fetching.query.QueryableItem;
 import main.java.action.fetching.utils.ClassFiller;
@@ -20,8 +17,6 @@ import main.java.database.Connector;
 import main.java.migration.Configuration;
 import main.java.migration.MappedClassDescription;
 import main.java.migration.field.FieldDescription;
-import main.java.migration.field.FieldType;
-import main.java.utils.MethodNameConverter;
 
 public class FetchingController {
 	private Configuration configuration;
@@ -92,7 +87,7 @@ public class FetchingController {
 	private <T> String createBasicQueryForClass(Class <T> cls){
 		MappedClassDescription mcd = this.configuration.getDescription(cls.getSimpleName());
 		String sql = "SELECT ";		
-		SortedMap<String, FieldDescription> fields = mcd.getFields();
+		Map<String, FieldDescription> fields = mcd.getFields();
 		Set<String> fieldSet = (Set<String>) mcd.getFields().keySet();
 		Iterator<String> it = fieldSet.iterator();
 		while(it.hasNext()) {

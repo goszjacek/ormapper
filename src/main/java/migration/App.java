@@ -3,7 +3,7 @@ package main.java.migration;
 import java.io.File;
 
 import main.java.database.Connector;
-import main.java.migration.exceptions.ParsingError;
+import main.java.migration.exceptions.ParsingException;
 
 public class App {
 
@@ -13,7 +13,7 @@ public class App {
 		Connector.establishConnection();
 		try {
 			mappingController.readConfiguration(new File("./input.xml"));
-		} catch (ParsingError e) {
+		} catch (ParsingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -11,12 +11,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import main.java.migration.exceptions.NoAttributeException;
-import main.java.migration.exceptions.ParsingError;
+import main.java.migration.exceptions.ParsingException;
 import main.java.migration.exceptions.WrongClassDescriptionException;
 import main.java.migration.field.FieldDescription;
 
@@ -32,7 +33,7 @@ public class ConfigurationFileReader {
 		return doc;
 	}
 	
-	public static void parseMainFile(File inputFile, Configuration configuration) throws ParsingError{
+	public static void parseMainFile(File inputFile, Configuration configuration) throws ParsingException{
 		
         
 		try {
@@ -43,9 +44,19 @@ public class ConfigurationFileReader {
 	           Node tmpClassNode = classNodeList.item(i);               
 	           if (tmpClassNode.getNodeType() == Node.ELEMENT_NODE) {
 	              Element cls = (Element) tmpClassNode;
-	              String path = cls.getAttribute("path");
-	              String desc = cls.getAttribute("description");
-	              String clsName = cls.getAttribute("name");
+	              NamedNodeMap attrs = cls.getAttributes();
+	              if(attrs == null) {
+	            	  throw new ParsingException(new NoAttributeException());	            	  
+	              }
+	              Node pathNode = attrs.getNamedItem("path");
+	              Node descNode = attrs.getNamedItem("description");
+	              Node clsNameNode = attrs.getNamedItem("name");
+	              if(pathNode == null || descNode == null || clsNameNode == null) {
+	            	  throw new ParsingException(); 
+	              }
+	              String path = pathNode.getNodeValue();
+	              String desc = descNode.getNodeValue();
+	              String clsName = clsNameNode.getNodeValue();
 	              String clsPath = path.replace('/','.');
 	              MappedClassDescription mcd = new MappedClassDescription();
 	              mcd.setPath(clsPath);
@@ -55,21 +66,19 @@ public class ConfigurationFileReader {
 	            	  readClass(mcd);
 	            	  configuration.setDescription(clsName, mcd);
 	              } catch(WrongClassDescriptionException e) {
-	            	  System.err.println("Class description couldn't be read. ");
-	            	  throw new ParsingError();
+	            	  throw new ParsingException(e);
 	              } catch(ClassNotFoundException e) {
 	            	  System.err.println("Class not found. Check configuration of the class");
-	            	  throw new ParsingError();
+	            	  throw new ParsingException(e);
 	              }
 	              
 	           }	           
-	        }
-	        
+	        }     
 	       
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			System.err.println("Parsing error");
 			e.printStackTrace();
-			throw new ParsingError();
+			throw new ParsingException(e);
 		}
 	}
 	
@@ -84,11 +93,19 @@ public class ConfigurationFileReader {
 				Node property = classnodeList.item(i);
 				if (property.getNodeType() == Node.ELEMENT_NODE) {
 					Element el = (Element) property;
-					String name = el.getAttribute("name"), column = el.getAttribute("column"), type=el.getAttribute("type");
-					if(name=="" || column=="" || type=="" )
+					NamedNodeMap map = el.getAttributes();
+					Node nameNode = map.getNamedItem("name"), columnNode = map.getNamedItem("column"), typeNode = map.getNamedItem("type"), idNode = map.getNamedItem("id");
+					if(nameNode != null && columnNode != null && typeNode!=null) {
+						String name = nameNode.getNodeValue(), column = columnNode.getNodeValue(), type=typeNode.getNodeValue();
+						FieldDescription fd = new FieldDescription(name, column, FieldDescription.getFieldType(type));
+						if(idNode!=null) {
+							mcd.setId(fd);
+						}
+						fieldDescriptions.put(name, fd);
+					}else {
 						throw new NoAttributeException();
-					FieldDescription fd = new FieldDescription(name, column, FieldDescription.getFieldType(type));
-					fieldDescriptions.put(name, fd);
+					}
+					
 				}
 			}
 			mcd.setFields(fieldDescriptions);
@@ -114,6 +131,14 @@ public class ConfigurationFileReader {
 		
 	}
 	
+	private static boolean checkNullNodes(Element el, String... names){
+		NamedNodeMap map = el.getAttributes();
+		 for (String name : names) {
+			 if(map.getNamedItem(name)==null)
+				 return false;
+		 }
+		 return true;
+	}
 	
 	private static void readClass(MappedClassDescription mcd) throws ClassNotFoundException {
 		ClassLoader classLoader = Configuration.class.getClassLoader();
