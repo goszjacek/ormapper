@@ -60,6 +60,17 @@ public class QueryableItem<T> implements Queryable<T>{
 		}
 	}
 	
+	public T id(int id) {
+		String updatedSql = this.sql + " WHERE " + mcd.getId().getColumnName() + " = " + id;
+		List<T> items =  executeSqlAndFillObjects(updatedSql);
+		return items.get(0);
+	}
+	
+	/**
+	 * Help method. It executes the sql and returns a list of filled objects. 
+	 * @param sql
+	 * @return
+	 */
 	private List<T> executeSqlAndFillObjects(String sql){
 		List<T> resultList = new ArrayList<T>();
 		System.out.println("Executing from querable: " + sql);
@@ -77,6 +88,7 @@ public class QueryableItem<T> implements Queryable<T>{
         }
 		return resultList;
 	}
+	
 	
 	
 
