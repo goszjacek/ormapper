@@ -52,23 +52,19 @@ public class ConfigurationFileReader {
 	              Node descNode = attrs.getNamedItem("description");
 	              Node clsNameNode = attrs.getNamedItem("name");
 	              if(pathNode == null || descNode == null || clsNameNode == null) {
+	            	  System.err.println("There are not enough attributes for the class");
 	            	  throw new ParsingException(); 
 	              }
 	              String path = pathNode.getNodeValue();
 	              String desc = descNode.getNodeValue();
 	              String clsName = clsNameNode.getNodeValue();
 	              String clsPath = path.replace('/','.');
-	              MappedClassDescription mcd = new MappedClassDescription();
-	              mcd.setPath(clsPath);
-	              mcd.setDesc(desc);
+//	              String clsPath = path;
 	              try {
-	            	  readDescriptionFile(mcd);
-	            	  readClass(mcd);
+	            	  MappedClassDescription mcd = readDescriptionFile(desc, clsPath);
 	            	  configuration.setDescription(clsName, mcd);
 	              } catch(WrongClassDescriptionException e) {
-	            	  throw new ParsingException(e);
-	              } catch(ClassNotFoundException e) {
-	            	  System.err.println("Class not found. Check configuration of the class");
+	            	  System.err.println("Description file wrong");
 	            	  throw new ParsingException(e);
 	              }
 	              
@@ -82,9 +78,10 @@ public class ConfigurationFileReader {
 		}
 	}
 	
-	private static void readDescriptionFile(MappedClassDescription mcd) throws WrongClassDescriptionException {
+	private static MappedClassDescription readDescriptionFile(String descriptionLocation, String path) throws WrongClassDescriptionException {
+		MappedClassDescription mcd = new MappedClassDescription(descriptionLocation, path);
 		try {
-			Document doc = prepareFile(new File(mcd.getDesc()));
+			Document doc = prepareFile(new File(descriptionLocation));
 			
 			SortedMap<String, FieldDescription> fieldDescriptions = new TreeMap<>();
 			
@@ -94,12 +91,15 @@ public class ConfigurationFileReader {
 				if (property.getNodeType() == Node.ELEMENT_NODE) {
 					Element el = (Element) property;
 					NamedNodeMap map = el.getAttributes();
-					Node nameNode = map.getNamedItem("name"), columnNode = map.getNamedItem("column"), typeNode = map.getNamedItem("type"), idNode = map.getNamedItem("id");
+					Node nameNode = map.getNamedItem("name"), columnNode = map.getNamedItem("column"), typeNode = map.getNamedItem("type"), featureNode = map.getNamedItem("feature");
 					if(nameNode != null && columnNode != null && typeNode!=null) {
 						String name = nameNode.getNodeValue(), column = columnNode.getNodeValue(), type=typeNode.getNodeValue();
 						FieldDescription fd = new FieldDescription(name, column, FieldDescription.getFieldType(type));
-						if(idNode!=null) {
-							mcd.setId(fd);
+						if(featureNode!=null) {
+							if(featureNode.getNodeValue().equals("id"))								
+								mcd.setId(fd);
+//							if(featureNode.getNodeValue()=="UniOneToOne")
+								
 						}
 						fieldDescriptions.put(name, fd);
 					}else {
@@ -118,6 +118,8 @@ public class ConfigurationFileReader {
 	        	throw new NoAttributeException();
 	        mcd.setTableName(table);
 	        mcd.setClassName(name);
+	        readClass(mcd);
+	        return mcd;
 			
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			System.err.println("The XML is wrong. Check the template documentation. ");
@@ -127,26 +129,23 @@ public class ConfigurationFileReader {
 			System.err.println("You didn't provide some of the important attributes. ");
 			e.printStackTrace();
 			throw new WrongClassDescriptionException();
+		} catch (ClassNotFoundException e) {
+			System.err.println("No such class");
+			throw new WrongClassDescriptionException();
 		}
 		
 	}
 	
-	private static boolean checkNullNodes(Element el, String... names){
-		NamedNodeMap map = el.getAttributes();
-		 for (String name : names) {
-			 if(map.getNamedItem(name)==null)
-				 return false;
-		 }
-		 return true;
-	}
+	
 	
 	private static void readClass(MappedClassDescription mcd) throws ClassNotFoundException {
 		ClassLoader classLoader = Configuration.class.getClassLoader();
-		
+//		System.out.println(mcd.getPath());
 		Class<?> thisClass = classLoader.loadClass(mcd.getPath());
 		mcd.setClassType(thisClass);
 	
 	}
+	
 	
 	
 	

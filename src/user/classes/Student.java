@@ -1,8 +1,9 @@
-package main.java.src_class;
+package user.classes;
 
 public class Student {
 	String firstName, lastName, birthDate;
 	Integer studentId;
+	Laptop laptop;
 	
 	public String getFirstName() {
 		return firstName;
@@ -27,6 +28,13 @@ public class Student {
 	}
 	public void setStudentId(Integer studentId) {
 		this.studentId = studentId;
+	}
+	
+	public Laptop getLaptop() {
+		return laptop;
+	}
+	public void setLaptop(Laptop laptop) {
+		this.laptop = laptop;
 	}
 	@Override
 	public String toString() {

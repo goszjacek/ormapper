@@ -5,13 +5,20 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import main.java.migration.field.FieldDescription;
+import main.java.migration.onetoone.OneToOneDescription;
 
 public class MappedClassDescription {
 	private Class classType;
 	private String className, tableName;
-	private SortedMap<String,FieldDescription> fields;
+	private Map<String,FieldDescription> fields;
+	private Map<String,OneToOneDescription> oneToOnes;
 	private String path, desc;
 	FieldDescription id;
+	
+	public MappedClassDescription(String descriptionLocation, String path) {
+		this.desc = descriptionLocation;
+		this.path = path;
+	}
 	public FieldDescription getId() {
 		return id;
 	}
@@ -33,7 +40,7 @@ public class MappedClassDescription {
 	public Map<String, FieldDescription> getFields() {
 		return fields;
 	}
-	public void setFields(SortedMap<String, FieldDescription> fields) {
+	public void setFields(Map<String, FieldDescription> fields) {
 		this.fields = fields;
 	}
 	public String getPath() {
@@ -68,6 +75,12 @@ public class MappedClassDescription {
 	}
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
+	}
+	public Map<String, OneToOneDescription> getOneToOnes() {
+		return oneToOnes;
+	}
+	public void setOneToOnes(Map<String, OneToOneDescription> oneToOnes) {
+		this.oneToOnes = oneToOnes;
 	}
 
 	

@@ -1,4 +1,4 @@
-package test.java;
+package main.java.utils;
 
 import static org.junit.Assert.assertTrue;
 

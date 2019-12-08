@@ -1,0 +1,9 @@
+<?xml version = "1.0"?>
+<ormapper>
+   <rootPath>test/user/</rootPath>
+   <classes>
+      <class name="Student" path="user/classes/Student" description="src/user/resource/description/sample_file_description.xml">  	 
+      </class>
+     <class name ="Laptop" path="user/classes/Laptop" description="src/user/resource/description/laptop.xml"></class>
+   </classes>
+</ormapper>

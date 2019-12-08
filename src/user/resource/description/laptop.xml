@@ -1,0 +1,9 @@
+<ormapper>
+	<src-class name="Laptop" table="laptop" >
+		<properties>
+			<property name="laptopId" column="laptop_id" type="int" feature="id"></property>
+			<property name="laptopCategoryId" column="laptop_category_id" type="int"></property>
+			<property name="model" column="model" type="text"></property>
+		</properties>
+	</src-class>
+</ormapper>

@@ -7,7 +7,7 @@ import main.java.action.fetching.query.QueryMode;
 import main.java.database.Connector;
 import main.java.migration.MappingController;
 import main.java.migration.exceptions.ParsingException;
-import main.java.src_class.Student;
+import user.classes.Student;
 
 public class FetchingTestApp {
 
@@ -15,11 +15,10 @@ public class FetchingTestApp {
 		Connector.establishConnection();
 		MappingController mappingController = new MappingController();
 		try {
-			mappingController.readConfiguration(new File("./input.xml"));
+			mappingController.readConfiguration(new File("src/user/resource/input.xml"));
 		} catch (ParsingException e) {
 			System.err.println("Configurations files are wrong. Check other messages. ");
 			e.getMessage();
-			e.printStackTrace();
 			return;
 		}
 		FetchingController fetchingController = mappingController.getFetchingController();
