@@ -55,7 +55,7 @@ public class ClassFiller {
 			while(it.hasNext()) {
 				FieldDescription field = (FieldDescription) fields.get(it.next());
 				//	run setter for the field and assign the value
-
+				System.out.println(field);
 				Method setter = mappedClass.getMethod(MethodNameConverter.getSetter(field.getFieldName()), field.getClassType());
 				
 				setter.invoke(item, getVar(rs, field.getColumnName(), field.getFieldType()));

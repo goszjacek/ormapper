@@ -2,6 +2,8 @@ package main.java.migration;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -20,6 +22,8 @@ import main.java.migration.exceptions.NoAttributeException;
 import main.java.migration.exceptions.ParsingException;
 import main.java.migration.exceptions.WrongClassDescriptionException;
 import main.java.migration.field.FieldDescription;
+import main.java.migration.field.FieldType;
+import main.java.utils.MethodNameConverter;
 
 public class ConfigurationFileReader {	
 	
@@ -80,8 +84,21 @@ public class ConfigurationFileReader {
 	
 	private static MappedClassDescription readDescriptionFile(String descriptionLocation, String path) throws WrongClassDescriptionException {
 		MappedClassDescription mcd = new MappedClassDescription(descriptionLocation, path);
+		
+		
 		try {
 			Document doc = prepareFile(new File(descriptionLocation));
+			
+			
+			NodeList srcs = doc.getElementsByTagName("src-class");
+	        Node src = srcs.item(0);
+	        String srcTableNode = ((Element) src).getAttribute("table"), srcNameNode = ((Element) src).getAttribute("name");
+	        if(srcTableNode=="" || srcNameNode=="")
+	        	throw new NoAttributeException();
+	        mcd.setTableName(srcTableNode);
+	        mcd.setClassName(srcNameNode);
+	        readClass(mcd);
+			
 			
 			SortedMap<String, FieldDescription> fieldDescriptions = new TreeMap<>();
 			
@@ -94,14 +111,36 @@ public class ConfigurationFileReader {
 					Node nameNode = map.getNamedItem("name"), columnNode = map.getNamedItem("column"), typeNode = map.getNamedItem("type"), featureNode = map.getNamedItem("feature");
 					if(nameNode != null && columnNode != null && typeNode!=null) {
 						String name = nameNode.getNodeValue(), column = columnNode.getNodeValue(), type=typeNode.getNodeValue();
-						FieldDescription fd = new FieldDescription(name, column, FieldDescription.getFieldType(type));
-						if(featureNode!=null) {
-							if(featureNode.getNodeValue().equals("id"))								
-								mcd.setId(fd);
-//							if(featureNode.getNodeValue()=="UniOneToOne")
-								
+						try {
+							if(featureNode!=null) {
+								if(featureNode.getNodeValue().equals("id")) {
+									FieldDescription fd;
+									fd = new FieldDescription(name, column, FieldDescription.getFieldType(type), readFieldClass(name, mcd.getClassType()),mcd.getClassType());
+									mcd.setId(fd); 
+									System.out.println(fd);
+									fieldDescriptions.put(name, fd);
+									
+									
+								}else if(featureNode.getNodeValue().toLowerCase().equals("unionetoone")) {
+									FieldDescription fd;								
+									fd = new FieldDescription(name, column, FieldType.ONETOONE, readFieldClass(name, mcd.getClassType()),mcd.getClassType());
+									fieldDescriptions.put(name, fd);
+								}
+									
+							}else {
+								if(type.equals("text")) {
+									fieldDescriptions.put(name, new FieldDescription(name, column, FieldType.STRING, String.class,mcd.getClassType()));
+								}
+								if(type.equals("int")) {
+									fieldDescriptions.put(name, new FieldDescription(name, column, FieldType.INT, Integer.class,mcd.getClassType()));
+								}
+							}
+							
+						} catch (SecurityException | NoSuchFieldException e) {
+							System.err.println("Check properties in a class description.");
+							e.printStackTrace();
 						}
-						fieldDescriptions.put(name, fd);
+						
 					}else {
 						throw new NoAttributeException();
 					}
@@ -111,27 +150,20 @@ public class ConfigurationFileReader {
 			mcd.setFields(fieldDescriptions);
 			
 			
-			NodeList srcs = doc.getElementsByTagName("src-class");
-	        Node src = srcs.item(0);
-	        String table = ((Element) src).getAttribute("table"), name = ((Element) src).getAttribute("name");
-	        if(table=="" || name=="")
-	        	throw new NoAttributeException();
-	        mcd.setTableName(table);
-	        mcd.setClassName(name);
-	        readClass(mcd);
+			
 	        return mcd;
 			
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			System.err.println("The XML is wrong. Check the template documentation. ");
 			e.printStackTrace();
-			throw new WrongClassDescriptionException();
+			throw new WrongClassDescriptionException(e);
 		} catch (NoAttributeException e) {
 			System.err.println("You didn't provide some of the important attributes. ");
 			e.printStackTrace();
-			throw new WrongClassDescriptionException();
+			throw new WrongClassDescriptionException(e);
 		} catch (ClassNotFoundException e) {
 			System.err.println("No such class");
-			throw new WrongClassDescriptionException();
+			throw new WrongClassDescriptionException(e);
 		}
 		
 	}
@@ -144,6 +176,13 @@ public class ConfigurationFileReader {
 		Class<?> thisClass = classLoader.loadClass(mcd.getPath());
 		mcd.setClassType(thisClass);
 	
+	}
+	
+	private static Class<?> readFieldClass(String fieldName, Class<?> cls) throws SecurityException, NoSuchFieldException {
+		Field field = cls.getDeclaredField(fieldName);
+		return field.getType();
+		
+		
 	}
 	
 	

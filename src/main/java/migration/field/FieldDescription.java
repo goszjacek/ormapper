@@ -1,19 +1,23 @@
 package main.java.migration.field;
 
+import java.lang.reflect.Method;
+
+import main.java.action.storing.exceptions.ReflectionException;
+import main.java.migration.MappedClassDescription;
+import main.java.utils.MethodNameConverter;
+
 public class FieldDescription {
 	String fieldName, columnName;
 	FieldType fieldType;
 	Class<?> classType;
-	public FieldDescription(String fieldName, String columnName, FieldType fieldType) {
+	Class<?> owner;
+	public FieldDescription(String fieldName, String columnName, FieldType fieldType, Class cls, Class owner) {
 		super();
 		this.fieldName = fieldName;
 		this.columnName = columnName;
 		this.fieldType = fieldType;
-		
-		if (fieldType==FieldType.INT)
-			this.classType = Integer.class;
-		if (fieldType==FieldType.STRING)
-			this.classType = String.class;
+		this.classType = cls;
+		this.owner = owner;
 	}
 	
 	public static FieldType getFieldType(String s) {
@@ -40,6 +44,26 @@ public class FieldDescription {
 
 	public Class<?> getClassType() {
 		return classType;
+	}
+	
+
+	public Class<?> getOwner() {
+		return owner;
+	}
+
+	@Override
+	public String toString() {
+		return "FieldDescription [fieldName=" + fieldName + ", columnName=" + columnName + ", fieldType=" + fieldType
+				+ ", classType=" + classType + "]";
+	}
+
+	public Method getSetter(MappedClassDescription mcd) throws ReflectionException {
+		// TODO Auto-generated method stub
+		try {
+			return mcd.getClassType().getMethod(MethodNameConverter.getSetter(this.fieldName), this.classType);
+		} catch (NoSuchMethodException | SecurityException e) {
+			throw new ReflectionException(this);
+		}
 	}
 	
 	

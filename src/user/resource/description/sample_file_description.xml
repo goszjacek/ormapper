@@ -5,7 +5,7 @@
 			<property name="lastName" column="last_name" type="text"></property>
 			<property name="birthDate" column="birth_date" type="text"></property>
 			<property name="studentId" column="student_id" type="int" feature="id"></property>
-			
+			<property name="laptop" column="laptop_id" type="int" feature="UniOneToOne"></property>
 		</properties>
 	</src-class>
 </ormapper>

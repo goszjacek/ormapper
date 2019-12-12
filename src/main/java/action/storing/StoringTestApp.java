@@ -27,11 +27,12 @@ public class StoringTestApp {
 		s.setBirthDate("1.1.1999");
 		s.setFirstName("Andreas");
 		s.setLastName("Endstein");
+		
 		StoringController sc = mappingController.getStoringController();
 		
 		
 		Laptop l = new Laptop();
-		l.setLaptopCategoryID(1);
+		l.setLaptopCategoryId(1);
 		l.setModel("Dell Latitude E330");
 		try {
 			sc.store(l);
@@ -39,12 +40,14 @@ public class StoringTestApp {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		s.setLaptop(l);
-//		try {
-//			sc.store(s);
-//		} catch (StoringException e) {
-//			e.printStackTrace();
-//		}
+		System.out.println("L: " + l.getLaptopId());
+		s.setLaptop(l);
+		try {
+			sc.store(s);
+		} catch (StoringException e) {
+			e.printStackTrace();
+		}
+		System.out.println("S: " + s.getStudentId());
 	}
 
 }

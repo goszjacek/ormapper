@@ -66,8 +66,7 @@ public class MappedClassDescription {
 		{
 			s += entry.getValue().getColumnName() + "\n" + entry.getValue().getFieldName() + "\n";
 		}
-		return s;
-			
+		return s;		
 		
 	}
 	public String getTableName() {

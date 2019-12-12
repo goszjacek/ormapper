@@ -39,8 +39,9 @@ public class Student {
 	@Override
 	public String toString() {
 		return "Student [firstName=" + firstName + ", lastName=" + lastName + ", birthDate=" + birthDate
-				+ ", studentId=" + studentId + "]";
+				+ ", studentId=" + studentId + ", laptop=" + laptop + "]";
 	}
+	
 	
 	
 	

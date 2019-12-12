@@ -11,6 +11,7 @@ import main.java.action.fetching.exceptions.WrongQueryException;
 import main.java.action.fetching.utils.ClassFiller;
 import main.java.database.Connector;
 import main.java.migration.MappedClassDescription;
+import main.java.migration.field.FieldDescription;
 
 public class QueryableItem<T> implements Queryable<T>{
 	String sql; 
@@ -47,16 +48,16 @@ public class QueryableItem<T> implements Queryable<T>{
 	}
 	
 	@Override
-	public List<T> where(String field, String relation, String value, QueryMode mode) {
+	public List<T> where(String field, String relation, String value, QueryMode mode) throws WrongQueryException {
 		if(mode == QueryMode.COLUMN) {
 			return this.where(field,relation,value);
 		}else {
-			String columnName = mcd.getField(field).getColumnName();
-			if(columnName == null) {
+			FieldDescription fieldDesc = mcd.getField(field);
+			if(fieldDesc == null) {
 				System.err.println("Probably such field doesn't exist");
-				return null;
+				throw new WrongQueryException();
 			}				
-			return this.where(columnName, relation, value);
+			return this.where(fieldDesc.getColumnName(), relation, value);
 		}
 	}
 	

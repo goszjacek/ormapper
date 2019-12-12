@@ -3,6 +3,7 @@ package main.java.action.fetching;
 import java.io.File;
 import java.util.List;
 
+import main.java.action.fetching.exceptions.WrongQueryException;
 import main.java.action.fetching.query.QueryMode;
 import main.java.database.Connector;
 import main.java.migration.MappingController;
@@ -31,15 +32,27 @@ public class FetchingTestApp {
 			System.out.println(s);
 		}
 		
-		List<Student> withClassFieldsWheredStudents = fetchingController.select(Student.class).where("firstName", "=","'Andrzej'", QueryMode.CLASS);
-		for(Student s : withClassFieldsWheredStudents) {
-			System.out.println(s);
+		List<Student> withClassFieldsWheredStudents;
+		try {
+			withClassFieldsWheredStudents = fetchingController.select(Student.class).where("firstName", "=","'Andrzej'", QueryMode.CLASS);
+			for(Student s : withClassFieldsWheredStudents) {
+				System.out.println(s);
+			}
+		} catch (WrongQueryException e1) {
+			e1.printStackTrace();
 		}
 		
-		List<Student> student4 = fetchingController.select(Student.class).where("studentId", "=","4", QueryMode.CLASS);
-		for(Student s : student4) {
-			System.out.println(s);
+		
+		List<Student> student4;
+		try {
+			student4 = fetchingController.select(Student.class).where("studentId", "=","34", QueryMode.CLASS);
+			for(Student s : student4) {
+				System.out.println(s);
+			}
+		} catch (WrongQueryException e) {
+			e.printStackTrace();
 		}
+		
 		
 		Student one = fetchingController.select(Student.class).id(1);
 		System.out.println(one);
