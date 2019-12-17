@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import main.java.action.fetching.FetchingController;
+import main.java.action.fetching.exceptions.WrongQueryException;
 import main.java.migration.MappedClassDescription;
 import main.java.migration.field.FieldDescription;
 import main.java.migration.field.FieldType;
@@ -25,7 +27,9 @@ public class ClassFiller {
 		return null;
 	}
 	
-	public  static <T> T fillObject(ResultSet rs, MappedClassDescription mcd) {
+	
+	
+	public  static <T> T fillObject(ResultSet rs, MappedClassDescription mcd, FetchingController fc) {
 		Class<T> mappedClass =  mcd.getClassType();
 		Constructor<T> constructor;
 		T item;
@@ -55,10 +59,20 @@ public class ClassFiller {
 			while(it.hasNext()) {
 				FieldDescription field = (FieldDescription) fields.get(it.next());
 				//	run setter for the field and assign the value
-				System.out.println(field);
-				Method setter = mappedClass.getMethod(MethodNameConverter.getSetter(field.getFieldName()), field.getClassType());
+//				System.out.println(field);
 				
-				setter.invoke(item, getVar(rs, field.getColumnName(), field.getFieldType()));
+				if(field.getFieldType() == FieldType.INT || field.getFieldType() == FieldType.STRING)
+				{
+					Method setter = mappedClass.getMethod(MethodNameConverter.getSetter(field.getFieldName()), field.getClassType());
+					setter.invoke(item, getVar(rs, field.getColumnName(), field.getFieldType()));
+				}
+				if(field.getFieldType() == FieldType.ONETOONE) {
+					Class whatIsIt = field.getClassType();
+					Object fieldObject = (Object) getVar(rs, field.getColumnName(), fc, whatIsIt);
+					Method setter = mappedClass.getMethod(MethodNameConverter.getSetter(field.getFieldName()), field.getClassType());
+					setter.invoke(item, fieldObject);
+				}
+					
 	
 			}
 		} catch (NoSuchMethodException | SecurityException e) {
@@ -67,11 +81,30 @@ public class ClassFiller {
 			return null;
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| SQLException e) {
-			System.err.println("Unable to invoke setter for the field. Check privided column name and filed type. ");
+			System.err.println("Unable to invoke setter for the field. Check provided column name and filed type. ");
 			e.printStackTrace();
 			return null;
 		} 
 		
 		return item;
+	}
+
+
+
+	private static <T> T getVar(ResultSet rs, String columnName, FetchingController fc, Class<T> whatIsIt) throws SQLException {
+		Integer itemId = rs.getInt(columnName);
+		System.out.println("Looking for item " + itemId);
+		if(itemId == 0)
+			return null;
+		T item;
+		try {
+			item = (T) fc.select(whatIsIt).id(itemId);
+			return item;
+		} catch (WrongQueryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 }

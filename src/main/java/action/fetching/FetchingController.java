@@ -63,7 +63,7 @@ public class FetchingController {
 	            
             // loop through the result set
             while (rs.next()) {
-            	T item = ClassFiller.fillObject(rs, mcd);
+            	T item = ClassFiller.fillObject(rs, mcd, this);
             	if(item != null){
             		resultList.add(item);
             	}
@@ -81,7 +81,7 @@ public class FetchingController {
 		MappedClassDescription mcd = this.configuration.getDescription(cls.getSimpleName());
 		System.out.println("Sql passed to queryable item: "+ sql);		
 		
-		return new QueryableItem<T>(sql, mcd);		
+		return new QueryableItem<T>(sql, mcd, this);		
 	}
 	
 	private <T> String createBasicQueryForClass(Class <T> cls){

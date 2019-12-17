@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.java.action.fetching.FetchingController;
 import main.java.action.fetching.exceptions.WrongQueryException;
 import main.java.action.fetching.utils.ClassFiller;
 import main.java.database.Connector;
@@ -16,13 +17,14 @@ import main.java.migration.field.FieldDescription;
 public class QueryableItem<T> implements Queryable<T>{
 	String sql; 
 	MappedClassDescription mcd;
+	FetchingController fc;
 	
 	
-	
-	public QueryableItem(String sql, MappedClassDescription mcd) {
+	public QueryableItem(String sql, MappedClassDescription mcd, FetchingController fc) {
 		super();
 		this.sql = sql;
 		this.mcd = mcd;
+		this.fc = fc;
 	}
 
 
@@ -61,9 +63,11 @@ public class QueryableItem<T> implements Queryable<T>{
 		}
 	}
 	
-	public T id(int id) {
+	public T id(int id) throws WrongQueryException {
 		String updatedSql = this.sql + " WHERE " + mcd.getId().getColumnName() + " = " + id;
 		List<T> items =  executeSqlAndFillObjects(updatedSql);
+		if(items.size()==0)
+			throw new WrongQueryException();
 		return items.get(0);
 	}
 	
@@ -80,7 +84,7 @@ public class QueryableItem<T> implements Queryable<T>{
 	             ResultSet rs    = stmt.executeQuery(sql)){	            
             // loop through the result set
             while (rs.next()) {
-            	resultList.add(ClassFiller.fillObject(rs, mcd));
+            	resultList.add(ClassFiller.fillObject(rs, mcd, fc));
             }
         } catch (SQLException e) {
         	System.err.println("Unable to connect to database or wrong SQL statement. ");

@@ -54,8 +54,15 @@ public class FetchingTestApp {
 		}
 		
 		
-		Student one = fetchingController.select(Student.class).id(1);
-		System.out.println(one);
+		Student one;
+		try {
+			one = fetchingController.select(Student.class).id(5);
+			System.out.println(one);
+		} catch (WrongQueryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		
 		
