@@ -1,9 +1,0 @@
-<?xml version = "1.0"?>
-<ormapper>
-   
-   <classes>
-      <class name="Student" path="main/java/src_class/Student" description="resource/ormapper/src_class_description/student.xml">  	 
-      </class>
-     
-   </classes>
-</ormapper>
