@@ -5,5 +5,6 @@
       <class name="Student" path="user/classes/Student" description="src/user/resource/description/student.xml">  	 
       </class>
      <class name ="Laptop" path="user/classes/Laptop" description="src/user/resource/description/laptop.xml"></class>
+     <class name ="Locker" path="user/classes/Locker" description="src/user/resource/description/locker.xml"></class>
    </classes>
 </ormapper>

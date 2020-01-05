@@ -4,6 +4,7 @@ public class Student {
 	String firstName, lastName, birthDate;
 	Integer studentId;
 	Laptop laptop;
+	Locker locker;
 	
 	public String getFirstName() {
 		return firstName;
@@ -36,11 +37,19 @@ public class Student {
 	public void setLaptop(Laptop laptop) {
 		this.laptop = laptop;
 	}
+	
+	public Locker getLocker() {
+		return locker;
+	}
+	public void setLocker(Locker locker) {
+		this.locker = locker;
+	}
 	@Override
 	public String toString() {
 		return "Student [firstName=" + firstName + ", lastName=" + lastName + ", birthDate=" + birthDate
-				+ ", studentId=" + studentId + ", laptop=" + laptop + "]";
+				+ ", studentId=" + studentId + ", laptop=" + laptop + ", locker=" + locker + "]";
 	}
+	
 	
 	
 	

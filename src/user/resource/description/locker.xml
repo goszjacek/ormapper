@@ -1,0 +1,8 @@
+<ormapper>
+	<src-class name="Locker" table="locker" >
+		<properties>
+			<property name="lockerId" column="locker_id" type="int" feature="id"></property>
+			<property name="owner" column="owner_id" type="int" feature="BiOneToOne"></property>
+		</properties>
+	</src-class>
+</ormapper>

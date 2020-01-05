@@ -6,6 +6,7 @@
 			<property name="birthDate" column="birth_date" type="text"></property>
 			<property name="studentId" column="student_id" type="int" feature="id"></property>
 			<property name="laptop" column="laptop_id" type="int" feature="UniOneToOne"></property>
+			<property name="locker" column="locker_id" type="int" feature="BiOneToOne"></property>
 		</properties>
 	</src-class>
 </ormapper>
