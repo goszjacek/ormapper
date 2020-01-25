@@ -46,8 +46,6 @@ public class StoringController {
 				System.err.println("Wrong statement: " + sql);
 				throw new StoringException(e);
 			}
-			
-			
 		} catch (WrongClassDescriptionException e) {
 			System.err.println(e.getMessage());
 			throw new StoringException(e);
@@ -131,7 +129,15 @@ public class StoringController {
 							Integer id = ClassGetter.getId(item, entry.getValue(), configuration);
 							sql += "'" + id + "', ";
 							any = true;
-						}else {
+						}else if(field.getFieldType().equals(FieldType.BIONETOONE)){
+							
+							Integer id = ClassGetter.getId(item, entry.getValue(), configuration);
+							
+								System.out.println("bionetoone is: " + id);
+							
+							
+						} else {
+						
 							sql += "'" + ClassGetter.get(item, entry.getValue()) + "', ";
 							any = true;
 						}

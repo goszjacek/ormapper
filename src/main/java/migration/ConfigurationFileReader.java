@@ -125,6 +125,10 @@ public class ConfigurationFileReader {
 									FieldDescription fd;								
 									fd = new FieldDescription(name, column, FieldType.ONETOONE, readFieldClass(name, mcd.getClassType()),mcd.getClassType());
 									fieldDescriptions.put(name, fd);
+								}else if(featureNode.getNodeValue().toLowerCase().equals("bionetoone")) {
+									FieldDescription fd;								
+									fd = new FieldDescription(name, column, FieldType.BIONETOONE, readFieldClass(name, mcd.getClassType()),mcd.getClassType());
+									fieldDescriptions.put(name, fd);
 								}
 									
 							}else {
