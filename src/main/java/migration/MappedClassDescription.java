@@ -81,6 +81,8 @@ public class MappedClassDescription {
 	public void setOneToOnes(Map<String, OneToOneDescription> oneToOnes) {
 		this.oneToOnes = oneToOnes;
 	}
+	
+	
 
 	
 }

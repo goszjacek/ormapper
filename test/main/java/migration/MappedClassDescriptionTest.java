@@ -36,7 +36,7 @@ class MappedClassDescriptionTest {
 	void parseMainFileTest() {
 		Configuration conf = null;
 		try {
-			ConfigurationFileReader.parseMainFile(new File(configurationPath), conf);
+			Configuration.parseMainFile(new File(configurationPath));
 			
 			// test content of configuration
 			

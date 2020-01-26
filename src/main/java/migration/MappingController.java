@@ -18,7 +18,7 @@ public class MappingController {
 	
 
 	public void readConfiguration(File file) throws ParsingException {
-		ConfigurationFileReader.parseMainFile(file, configuration);
+		Configuration.parseMainFile(file);
 		
 	}
 	
